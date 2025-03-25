@@ -56,7 +56,7 @@ def draw_init(screen, charset):
 
     pygame.display.update()
 
-def call(number, screen):
+def call(number, screen, attempts):
     font = pygame.font.SysFont("Comic Sans MS", 18)
     pygame.draw.rect(screen, "#2e2e2e", ((20, 20), (340, 60)))
     screen.blit(font.render(f"Calling {number}", True, "white"), (40, 40))
@@ -72,43 +72,46 @@ def call(number, screen):
             url="http://demo.twilio.com/docs/voice.xml"
         )
         print(call.sid)
+        return 0
     except Exception:
         print("Failed")
         pygame.draw.rect(screen, "#2e2e2e", ((20, 20), (340, 60)))
         screen.blit(font.render(f"Invalid Number LMAO", True, "white"), (40, 40))
+        attempts+=1
         pygame.display.update()
+        return attempts
     pygame.time.delay(500)
 
-def check_button_input(number, charset, screen):
+def check_button_input(number, charset, attempts, screen):
     x,y,clicked = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], pygame.mouse.get_pressed()[0]
     if len(number) < 13:
         if (20 <= x <=120) and (100 <= y <= 200) and clicked:
-            number += charset[0]; pygame.time.delay(200); return number, charset
+            number += charset[0]; pygame.time.delay(200); return number, charset, attempts
         elif (140 <= x <=240) and (100 <= y <= 200) and clicked:
-            number += charset[1]; pygame.time.delay(200); return number, charset
+            number += charset[1]; pygame.time.delay(200); return number, charset, attempts
         elif (260 <= x <=360) and (100 <= y <= 200) and clicked:
-            number += charset[2]; pygame.time.delay(200); return number, charset
+            number += charset[2]; pygame.time.delay(200); return number, charset, attempts
         elif (20 <= x <=120) and (220 <= y <= 320) and clicked:
-            number += charset[3]; pygame.time.delay(200); return number, charset
+            number += charset[3]; pygame.time.delay(200); return number, charset, attempts
         elif (140 <= x <=240) and (220 <= y <= 320) and clicked:
-            number += charset[4]; pygame.time.delay(200); return number, charset
+            number += charset[4]; pygame.time.delay(200); return number, charset, attempts
         elif (260 <= x <=360) and (220 <= y <= 320) and clicked:
-            number += charset[5]; pygame.time.delay(200); return number, charset
+            number += charset[5]; pygame.time.delay(200); return number, charset, attempts
         elif (20 <= x <=120) and (340 <= y <= 440) and clicked:
-            number += charset[6]; pygame.time.delay(200); return number, charset
+            number += charset[6]; pygame.time.delay(200); return number, charset, attempts
         elif (140 <= x <=240) and (340 <= y <= 440) and clicked:
-            number += charset[7]; pygame.time.delay(200); return number, charset
+            number += charset[7]; pygame.time.delay(200); return number, charset, attempts
         elif (260 <= x <=360) and (340 <= y <= 440) and clicked:
-            number += charset[8]; pygame.time.delay(200); return number, charset
+            number += charset[8]; pygame.time.delay(200); return number, charset, attempts
         elif (20 <= x <=120) and (460 <= y <= 560) and clicked:
-            number += charset[9]; pygame.time.delay(200); return number, charset
+            number += charset[9]; pygame.time.delay(200); return number, charset, attempts
         elif (140 <= x <=240) and (460 <= y <= 560) and clicked:
-            number += charset[10]; pygame.time.delay(200); return number, charset
+            number += charset[10]; pygame.time.delay(200); return number, charset, attempts
     if (260 <= x <=360) and (460 <= y <= 560) and clicked:
-        pygame.time.delay(200); return "", charset
+        pygame.time.delay(200); return "", charset, attempts
     if (20 <= x <= 360) and (580 <=y <= 660) and clicked:
-        call(number, screen); charset=randomise_values(); return "", charset
-    else: return number, charset
+        attempts = call(number, screen, attempts); charset=randomise_values(); return "", charset, attempts
+    else: return number, charset, attempts
     pygame.time.delay(400)
 
 def main_window():
@@ -119,13 +122,16 @@ def main_window():
     pygame.font.init()
     font = pygame.font.SysFont("wingdings", 18)
     charset = randomise_values()
+    attempts = 0
     number = ""
     draw_init(screen, charset)
     while running:
+        if attempts >= 3: font = pygame.font.SysFont("Comic Sans MS", 18)
+        else: font = pygame.font.SysFont("wingdings", 18)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        number, charset = check_button_input(number, charset, screen)
+        number, charset, attempts = check_button_input(number, charset, attempts, screen)
         pygame.draw.rect(screen, "#2e2e2e", ((20, 20), (340, 60))),
         screen.blit(font.render(number, True, "white"), (40, 40))
         pygame.display.flip()
